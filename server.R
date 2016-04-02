@@ -51,15 +51,15 @@ shinyServer(function(input, output) {
     output$s11_code_aids <- renderText({
         if (input$chapter == "Chapter 1" && input$section == "Section 1.1") {
             if (naf(input$data) && input$data == "AIDS") {
-                if (input$s11_loess && !input$s11_sample) {
-                    includeMarkdown("./md/s11_code_aids_loess.Rmd")
-                } else if (input$s11_sample && !input$s11_loess) {
-                    includeMarkdown("./md/s11_code_aids_sample.Rmd")
-                } else if (input$s11_sample && input$s11_loess) {
-                    includeMarkdown("./md/s11_code_aids_loess_sample.Rmd")
-                } else {
+                #if (input$s11_loess && !input$s11_sample) {
+                #    includeMarkdown("./md/s11_code_aids_loess.Rmd")
+                #} else if (input$s11_sample && !input$s11_loess) {
+                #    includeMarkdown("./md/s11_code_aids_sample.Rmd")
+                #} else if (input$s11_sample && input$s11_loess) {
+                #    includeMarkdown("./md/s11_code_aids_loess_sample.Rmd")
+                #} else {
                     includeMarkdown("./md/s11_code_aids.Rmd")
-                }
+                #}
             }
         }
     })
@@ -2246,36 +2246,21 @@ shinyServer(function(input, output) {
             }
             
             if (!is.null(input$data) && input$data == "AIDS") {
-                if (input$s11_loess && !input$s11_sample) {
-                    print(xyplot(sqrt(CD4) ~ obstime | drug, group = patient, 
-                                 panel = function (x, y, ...) {
-                                     panel.xyplot(x, y, type = "l", col = 1, ...)
-                                     panel.loess(x, y, col = 2, lwd = 2)
-                                 }, data = aids, xlab = "Time (months)", 
-                                 ylab = "square root CD4 cell count"))
+              ids <- c(455, 313, 345, 301, 17, 20, 208, 381, 389, 100, 254, 224, 
+                       280, 288, 398, 405)
+              
+              g <- ggplot( data = aids, aes(x = obstime, y = sqrt(CD4) ) ) + 
+                geom_line( aes( group = patient ), alpha = 0.2 ) + facet_wrap( ~drug, ncol = 2) +
+                labs(x = "Time (months)", y = "sqrt(CD4)")
+              
+              if (input$s11_loess && !input$s11_sample) {
+                    print( g + geom_smooth( size = 1 ) )
                 } else if (!input$s11_loess && input$s11_sample) {
-                    ids <- c(455, 313, 345, 301, 17, 20, 208, 381, 389, 100, 254, 224, 
-                             280, 288, 398, 405)
-                    print(xyplot(sqrt(CD4) ~ obstime | patient, data = aids, subset = patient %in% ids, 
-                           type = "l", col = 1, layout = c(4, 4), as.table = TRUE,
-                           xlab = "Time (months)",  
-                           ylab = "square root CD4 cell count"))
-                    
+                    print( g %+% subset( aids, patient %in% ids ) )
                 } else if (input$s11_loess && input$s11_sample) {
-                    ids <- c(455, 313, 345, 301, 17, 20, 208, 381, 389, 100, 254, 224, 
-                             280, 288, 398, 405)
-                    print(xyplot(sqrt(CD4) ~ obstime | patient, 
-                           panel = function (x, y, ...) {
-                               panel.xyplot(x, y, type = "l", col = 1, ...)
-                               if (length(unique(x)) > 3)
-                                   panel.spline(x, y, col = 2, lwd = 2)
-                           }, data = aids, subset = patient %in% ids, layout = c(4, 4), as.table = TRUE,
-                           xlab = "Time (months)",  
-                           ylab = "square root CD4 cell count"))
+                    print( g %+% subset( aids, patient %in% ids ) + geom_smooth( size = 1 ) )
                 } else {
-                    print(xyplot(sqrt(CD4) ~ obstime | drug, group = patient, data = aids,
-                                 type = "l", col = 1, xlab = "Time (months)", 
-                                 ylab = "square root CD4 cell count"))
+                    print( g )
                 }
             }
             if (!is.null(input$data) && input$data == "PBC") {

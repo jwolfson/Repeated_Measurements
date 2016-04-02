@@ -7,6 +7,8 @@ library("MCMCglmm")
 library("splines")
 library("corrplot")
 library("MASS")
+library("ggplot2")
+
 con <- url("https://raw.github.com/drizopoulos/Repeated_Measurements/master/Data.RData")
 load(con)
 close(con)
