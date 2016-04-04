@@ -2222,26 +2222,17 @@ shinyServer(function(input, output) {
     output$plot <- renderPlot({
         if (input$chapter == "Chapter 1" && input$section == "Section 1.1") {
             if (!is.null(input$data) && input$data == "Glaucoma") {
-                index <- c(rep(T, 2), rep(F, 4), rep(T, 4), rep(F, 6), rep(T, 2), rep(F, 8), T,
-                           F, T, rep(F, 7), F, T, rep(F, 15), rep(T, 2), rep(F, 6), rep(T, 4),
-                           rep(F, 4), rep(T, 3))
                 id. <- as.character(input$id)
                 eye. <- if (input$eye == "right") 1 else 2
+                
+                g <- ggplot( data = subset(glaucoma, id == id. & eye == eye.), aes( x = years, y = thres )) +
+                  geom_line( alpha = 0.4 ) + facet_wrap( ~pos, ncol = 8) +
+                  labs(x = "Time (years)", y = "Sensitivity Estimate (dB)")
+                
                 if (input$s11_loess) {
-                    print(xyplot(thres ~ years | pos, 
-                                 data = glaucoma[glaucoma$id == id. & glaucoma$eye == eye., ],
-                                 panel = function (x, y, ...) {
-                                     panel.xyplot(x, y, type = "l", col = 1, ...)
-                                     panel.loess(x, y, col = 2, lwd = 2)
-                                 }, as.table = TRUE, layout = c(9, 8), skip = index,
-                                 strip = FALSE,
-                                 xlab = "Time (years)", ylab = "Sensitivity Estimate (dB)"))
+                    print( g + geom_smooth())
                 } else {
-                    print(xyplot(thres ~ years | pos, 
-                                 data = glaucoma[glaucoma$id == id. & glaucoma$eye == eye., ],
-                           type = "l", col = 1, as.table = TRUE, layout = c(9, 8), skip = index,
-                           strip = FALSE,
-                           xlab = "Time (years)", ylab = "Sensitivity Estimate (dB)"))
+                    print(g)
                 }
             }
             
